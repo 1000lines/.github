@@ -16,8 +16,7 @@ The longer argument, on what code review is for once agents write most of it:
 - **symphony**: our fork of [openai/symphony](https://github.com/openai/symphony),
   by way of Orchestra-Bio's public fork. The orchestrator. Install Elixir and run it
   on a laptop or in the cloud.
-- **symphony-example**: a repository wired for agent work, as a worked example.
-  Coming any day, from Orchestra Bio.
+- **symphony-example**: a repository wired for agent work, as a worked example, from Orchestra Bio.
 - **the template**: one command to turn an existing repository into one agents can
   work in under review. Being built on Saturday 12 September at the
   [AI Tinkerers hackathon](https://sf.aitinkerers.org/p/agents-everywhere-bots-channels-more-global-hackathon).
