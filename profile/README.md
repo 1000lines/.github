@@ -80,7 +80,7 @@ tickets. The tickets fan out into small pull requests, each one sized so you can
 hold it in your head. You review them, and your feedback drives the next round of
 planning.
 
-### Before Saturday
+### As Soon As You Can
 
 Send me the repo URL and whether it has a Docker build. We will get it wired up as
 you arrive.
