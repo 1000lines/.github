@@ -1,85 +1,94 @@
 # 1000lines
 
-Code review has been a cornerstone of software engineering for fifty years. There have been significant changes over that time, but agentic development is the first that suggests code review should cease altogether ([Monperrus](https://arxiv.org/pdf/2606.13175)).
+**Agent speed. Human judgment.**
 
-We agree. We differ. We concede the vast bulk of the argument, and then part company over what is left. These are the functions of review that we think should continue, and why.
+## What has changed in software development
 
-## The functions that survive
+Agents have made implementation dramatically cheaper. The cost of *deciding what to build* has not fallen with it, and neither has the cost of being accountable for the result.
 
-**Responsibility.** This requires a human in the loop somewhere. Software matters: very often with large business consequences, and not so infrequently with life-or-death ones. Society still wants humans on the line for such things. So do I. Which means asking a reviewer to sign off has to be different from asking for a rubber stamp, and so the most pressing question about code review, once the rest of the argument is granted, is how to make responsibility meaningful.
+Many software development practices were shaped around scarce implementation capacity: estimation, scoping, change control, sprint commitment, and the review queue itself. Producing more code shifts the constraint. Human attention becomes the scarce resource: understanding what was wanted, deciding whether what arrived was right, and keeping a record good enough to answer for it later.
 
-**Requirements and design review.** There has always been a focus on reviewing what we are trying to do before we start doing it. The key insight is that these plans do not survive contact with reality, and flexibility in execution is needed. As we see what we are building, we learn, and our ideas change. That does not undermine the need to agree a goal before starting. It is a good place for human involvement.
+An agent can hand you thirty thousand lines in forty pull requests. Each diff can look plausible while the project heads in the wrong direction. If nobody can understand the whole, approval becomes a rubber stamp. Smaller PRs help, but choosing the right forty is a planning problem; recognizing that they were the wrong forty is a replanning problem.
 
-**Planning supervision.** One of the two foci of this first version of 1000lines. Plans for software development have always involved breaking a design into tasks, each relatively self-contained, with dependencies between them. Drawn as a line in a Gantt chart, these dependencies are in practice a DAG. The key improvements in software engineering have been about making such plans more flexible, most notably Agile. We express plans as mermaid diagrams, which become one of the primary reviewable artifacts, legible to both humans and machines.
+1000lines puts those decisions in front of humans while they are still small enough to understand.
 
-**A legible trail of decisions and rationales.** The second and last focus of this first version. Smaller pull requests, perhaps under a thousand lines, are easier to understand than larger ones, particularly when they do one thing. This matters whether the reviewer is a human, an AI, or a human giving a quick eyeball and a stamp. If the PR is not legible, the stamp can only be a rubber stamp; a stamp on a legible document is worth something to the responsibility path. And even in an AI-only workflow, legible records give an escalation path for audit or troubleshooting: a path that is boring and unimportant, until it isn't.
+## What your attention goes to
 
-**Semi-formal breaking down of complex decisions into simpler ones.** Useful whether the decisions are reviewed by a person or a machine. This follows from good planning with legible records.
-
-We agree with Monperrus that several traditional functions of review are now better fully automated, because LLMs outperform people at them: defect detection, and style and standards enforcement. In our own human-in-the-loop workflow, an approval means the human has reviewed the AI reviews, not that the human has meaningfully reviewed the code. The traditional role of knowledge transfer is better served by documentation maintenance, where again we would expect LLMs to excel.
-
-That is most of what code review was for. We are not arguing for its preservation out of sentiment.
-
-## What changes for a business
-
-The cost of building software has collapsed. The cost of *deciding what to build* has not, and neither has the cost of being accountable for it afterwards.
-
-For fifty years the scarce resource was implementation capacity. Many SDLC practices were shaped around rationing it: estimation, scoping, change control, sprint commitment, and the review queue itself. When that constraint goes, the practices built to manage it may cease to be useful. They become the wrong shape.
-
-What stays scarce is narrower and higher level: the clarity of what was actually wanted, the capacity to decide whether what arrived was right, and a record good enough to answer for it later. Those are the three things a business is now short of, and none of them are addressed by producing code faster.
-
-1000lines is an attempt to put engineering effort where the scarcity now is.
-
-## What it does
-
-A human writes a rough description of what they want. Those rough notes are turned into a cleaned-up requirements document and, after review, a planner creates a dependency graph of small tickets. **A human reviews the graph**, one picture rather than forty tickets, and approves the shape. Agents then work the graph's frontier, each ticket becoming its own pull request against a base that actually exists. The PRs are reviewed, by AIs and probably by humans. When reality diverges from the plan, the plan is replaced rather than patched.
+Suppose the goal is to let a customer preview a CSV import, correct invalid rows, and save the accepted data. Compare a queue of changes with a plan you can question before agents start:
 
 ```mermaid
 flowchart LR
-  D([rough description]) --> P(( ))
-  P --> L1[parser]
-  P --> L2[scaffolding]
-  P --> L3[payload writer]
-  P --> L4[prompt + skills]
-  L1 --> J(( ))
-  L2 --> J
-  L3 --> J
-  L4 --> J
-  J --> I1[frontier computation]
-  J --> I2[conflict routing]
-  I1 --> F(( ))
-  I2 --> F
-  F --> A([human review])
+  subgraph PILE["A queue of plausible changes"]
+    direction TB
+    DIFFS["PR 01: +980 lines<br/>PR 02: +760 lines<br/>PR 03: +1,240 lines<br/>PR 04: +890 lines<br/>…<br/>PR 40: +1,100 lines"]
+    STAMP["Skim forty diffs?<br/>Approve without understanding?"]
+    DIFFS --> STAMP
+  end
+  subgraph PLAN["1000lines: review the shape first"]
+    direction TB
+    GOAL["Human: agree the import goal"]
+    PARSE["Parse rows"]
+    RULES["Validate fields"]
+    PREVIEW["Show errors and preview"]
+    SAVE["Save accepted rows"]
+    HUMAN["Human: inspect the result<br/>Accept or change direction"]
+    GOAL --> PARSE
+    GOAL --> RULES
+    PARSE --> PREVIEW
+    RULES --> PREVIEW
+    PREVIEW --> SAVE
+    SAVE --> HUMAN
+  end
+  PILE ~~~ PLAN
+  classDef work fill:#ddf4ff,stroke:#0969da,color:#1f2328
+  classDef human fill:#dafbe1,stroke:#1a7f37,color:#1f2328
+  classDef overload fill:#fff1e5,stroke:#bc4c00,color:#1f2328
+  class PARSE,RULES,PREVIEW,SAVE work
+  class GOAL,HUMAN human
+  class DIFFS,STAMP overload
 ```
 
-*Illustrative. Real plans are generated per project and committed to the repository as their own artifact.*
+*Illustrative. Blue tasks become focused PRs with AI review and human acceptance. Green nodes show goal and outcome decisions; the graph itself is reviewed before execution. Real plans link tasks to their PRs and show progress.*
 
-## Requirements and design: how much is enough
+The aim is to inspect the shape of the work before reading its results. The diffs remain available, and a tidy diagram does not prove correctness. It makes missing work, dependencies, and unnecessary complexity easier to question.
 
-The specification-first camp is right about the order and wrong about the quantity. We make a first pass with a deliberately low bar, then get going.
+## Why human review still matters
 
-The economics moved unevenly. Writing became almost free; reading costs what it always did, and the human reader is the scarce resource. A long generated specification costs more to read, and it loses the thinking too, because writing was how somebody was forced to think the problem through.
+[Martin Monperrus argues that coding agents can take over the traditional functions of code review](https://arxiv.org/abs/2606.13175), and that having humans inspect every change cannot keep pace. We accept much of that argument. Defect detection, style enforcement, and documentation maintenance belong primarily with automation in our workflow. Two human functions remain:
 
-Meanwhile the most useful review of a design has always been working code, and for fifty years it was unaffordable: you could not build the thing merely to find out whether the design was right. Now you can.
+**Responsibility.** Software has consequences. Someone must understand the outcome, the evidence, and the tradeoffs well enough to answer for them. Asking that person to approve an illegible change does not establish meaningful responsibility. Our human reviewer considers the AI reviews and the result; we do not pretend they have inspected every line.
 
-So the question is how much documentation up front. Enough to plan from, meaning enough to produce a decomposition that a person can review, rather than enough to determine the implementation.
+**Requirements and design judgment.** We need agreement about what we are trying to achieve, and permission to change our minds as we learn. Passing tests and an AI review cannot establish that the result is what a person or business actually needs. Goals, tradeoffs, and changes of direction are useful places for human involvement.
 
-A plan is not a specification. It is a decomposition with a review gate, revised cheaply and often, with the revisions recorded. This matters beyond guardrails and evals, which evaluate one change at a time: many of the important failures are emergent, and when coding and replanning are both cheap, the answer is to start over.
+## Enough planning to make a decision
 
-## Planning supervision: why a graph
+Start with a short account of the intended outcome, then a coherent set of tasks and their dependencies. There should be enough detail for a person to question the decomposition, without having to read an implementation in prose.
+
+The specification-first camp is right about the order and wrong about the quantity. We make a first pass with a deliberately low bar, then get going. Writing became cheap; reading still consumes the scarce human attention. Working software also teaches us things that a longer specification will not.
+
+A usable plan therefore needs clear task boundaries, visible dependencies, and a way to record changed decisions. It must be cheap to revise. Planning once and treating every later discovery as an implementation defect would miss the point.
+
+## What 1000lines does
+
+1. **Clarify the goal.** A human's rough description becomes requirements and a design for review, with enough detail to plan from.
+2. **Review the shape.** A planner proposes small tasks and their dependency graph. A human reviews that picture before the work fans out into tickets.
+3. **Execute and review.** Agents work on tasks whose dependencies are ready. Each produces a focused PR against a base that exists, with AI review findings and a clear human handoff.
+4. **Replan when understanding changes.** A human with write access can change the design through PR feedback; agents record the decision and implement it. If the task boundary holds, replace the approach within it. Small boundary changes can add, remove, or split a task, with a ticket where needed. Larger changes create a planning ticket and a fan-out ticket so the revised graph can be reviewed before execution resumes.
+
+The first version concentrates on two mechanisms: a reviewable dependency graph, and a legible trail of decisions and rationales in focused PRs. They help humans exercise judgment, and give both humans and agents a record to consult when something goes wrong. A thousand lines is an ambition for manageable work, not proof that a change is small or sound.
+
+## Why the graph earns its place
 
 The obvious way to use agents at scale is to fan the work out and collect the pull requests. We tried it. The orchestrator coped, ploughing steadily through forty tickets at once, and the correctness was terrible.
 
-It did not fail loudly. Each diff was individually plausible. The defect was in the decomposition: tickets that should have been ordered ran in parallel against bases that did not exist yet, each inventing its own version of work that had not landed. Review does not catch that, because there is nothing wrong with any single change. Neither does a guardrail, for the same reason.
+It did not fail loudly. Each diff was individually plausible. Tickets that should have been ordered ran in parallel against bases that did not exist yet, each inventing its own version of work that had not landed. Reviewing a change in isolation made the problem hard to see.
 
-Which is the argument in one line: **correctness lives in the plan, not in the diff.** Review catches bad changes. Only planning catches bad decomposition, and nobody audits the plan.
+**Correctness depends on the plan as well as the diff.** The graph exposes assumptions about dependencies and parallel work, so a reviewer can challenge them. When those assumptions fail, it also helps identify what needs replanning.
 
-So the plan is the artifact we ask a person to look at, and a diagram is what makes that a minute's work rather than an afternoon's.
+## What is running, and what is being built
 
-## What we have running, and what is here
-
-The code, and the example code, is taken from the agentic framework we are using on our actual codebase today: planning, human plan review, fan-out into reviewed pull requests, mechanical consequence-tiering computed from the diff, and whole-project replanning to recover from any major execution mistake. What is made available here is a sane extraction, excluding our own business context.
+1000lines is being extracted from the agentic framework used on Orchestra Bio's codebase: planning, human plan review, fan-out into reviewed PRs, and replanning after execution reveals a mistake. The public repositories remove that business context and provide a place to try the approach elsewhere.
 
 - [**symphony**](https://github.com/1000lines/symphony): our fork of [openai/symphony](https://github.com/openai/symphony), Apache 2.0, the orchestrator underneath.
-- **symphony-example**: coming any day, a repository wired for agent work, as a worked example.
-- **the template**: to be built during the hackathon on 12 September. One command turns an existing repository into one agents can work in under review.
+- [**symphony-example**](https://github.com/1000lines/symphony-example): a repository wired for agent work, and a worked example of the planning and review flow.
+- **The client template and reusable workflows**: in development for the 12 September hackathon, following the [reviewed implementation plan](https://github.com/1000lines/symphony-example/pull/34). The goal is to onboard an existing repository to the shared Symphony service without requiring its owner to run a server.
