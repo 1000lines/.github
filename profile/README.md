@@ -52,5 +52,35 @@ changes: [1000lines](https://github.com/1000lines/.github/blob/main/README.md).
 
 ## If you're at the hackathon
 
-Bring a repo you own. We aim to get agent workflows running in your project and find
-out how the planning and review flow works on a codebase that isn't ours.
+Bring a repo you own. Not code, a repo. You leave with agent workflows running in
+your own project, and we find out whether this survives contact with a codebase that
+isn't ours.
+
+### What you need
+
+- A GitHub repo you own and whose settings you can change. Public is easiest.
+- CI that passes on main. A Docker build is ideal. If it needs secrets, tell me in
+  advance; that is a different setup path.
+- A merge path that does not require two approvals or a code owner.
+- A Linear account. We will add you to the workspace.
+- A piece of work you would like to start: a few paragraphs of notes, not a spec.
+  Something real you have been putting off.
+- Two or three hours in the room. You are the reviewer for your own repo, so the
+  loop stops when you walk away.
+
+### What you do not need
+
+No server, no API key, no Elixir install, nothing running on your laptop. Symphony
+runs in the cloud. You review pull requests in your own repo, in a browser.
+
+### What happens
+
+Your notes become a plan for you to review. The plan becomes a dependency graph of
+tickets. The tickets fan out into small pull requests, each one sized so you can
+hold it in your head. You review them, and your feedback drives the next round of
+planning.
+
+### Before Saturday
+
+Send me the repo URL and whether it has a Docker build. We will get it wired up as
+you arrive.
