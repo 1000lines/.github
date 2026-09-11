@@ -59,7 +59,7 @@ isn't ours.
 ### What you need
 
 - A GitHub repo you own and whose settings you can change. Public is easiest.
-- CI that passes on main. A Docker build is ideal. If it needs secrets, tell me in
+- CI that passes on main. A Docker build is a bonus. If it needs secrets, tell me in
   advance; that is a different setup path.
 - A merge path that does not require two approvals or a code owner.
 - A Linear account. We will add you to the workspace.
