@@ -2,6 +2,10 @@
 
 **Agent speed. Human judgment.**
 
+> **AI Tinkerers hackathon participants:** Start with the
+> [hackathon onboarding guide](https://github.com/1000lines/symphony-client-template/blob/main/hackathon/README.md)
+> for repository setup, App installation, project workflow, and the goals for the day.
+
 An agent can hand you thirty thousand lines in forty pull requests. If nobody can
 understand the whole, approval becomes a rubber stamp. Producing code got cheaper;
 deciding what to build and taking responsibility for it did not.
